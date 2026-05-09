@@ -1,0 +1,1170 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>How Well Do You Know Naman?</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600;700;900&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
+<style>
+  /* ── RESET & BASE ── */
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  :root {
+    --bg: #080b10;
+    --bg2: #0d1117;
+    --surface: rgba(255,255,255,0.04);
+    --border: rgba(255,255,255,0.08);
+    --cyan: #00f5ff;
+    --pink: #ff2d78;
+    --gold: #ffd95a;
+    --text: #e8eaf0;
+    --muted: #5a6072;
+    --radius: 16px;
+    --glow-c: 0 0 12px #00f5ff88, 0 0 40px #00f5ff33;
+    --glow-p: 0 0 12px #ff2d7888, 0 0 40px #ff2d7833;
+    --transition: 0.4s cubic-bezier(0.16,1,0.3,1);
+  }
+
+  html { scroll-behavior: smooth; }
+
+  body {
+    font-family: 'Montserrat', sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    min-height: 100vh;
+    overflow-x: hidden;
+    position: relative;
+  }
+
+  /* ── ANIMATED GRID BACKGROUND ── */
+  body::before {
+    content: '';
+    position: fixed;
+    inset: 0;
+    background-image:
+      linear-gradient(rgba(0,245,255,0.03) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(0,245,255,0.03) 1px, transparent 1px);
+    background-size: 60px 60px;
+    pointer-events: none;
+    z-index: 0;
+  }
+
+  body::after {
+    content: '';
+    position: fixed;
+    inset: 0;
+    background:
+      radial-gradient(ellipse 60% 50% at 20% 20%, rgba(0,245,255,0.06) 0%, transparent 60%),
+      radial-gradient(ellipse 50% 40% at 80% 80%, rgba(255,45,120,0.06) 0%, transparent 60%);
+    pointer-events: none;
+    z-index: 0;
+  }
+
+  /* ── NOISE OVERLAY ── */
+  .noise {
+    position: fixed;
+    inset: 0;
+    opacity: 0.025;
+    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+    background-size: 200px 200px;
+    pointer-events: none;
+    z-index: 0;
+  }
+
+  /* ── LAYOUT ── */
+  .page {
+    position: relative;
+    z-index: 1;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 40px 24px 60px;
+    transition: opacity var(--transition), transform var(--transition);
+  }
+
+  .page.hidden {
+    opacity: 0;
+    transform: translateY(-24px) scale(0.98);
+    pointer-events: none;
+    position: absolute;
+    top: 0; left: 0; right: 0;
+  }
+
+  /* ── HOME PAGE ── */
+  #home {
+    justify-content: center;
+    gap: 0;
+  }
+
+  .profile-wrap {
+    position: relative;
+    width: 140px;
+    height: 140px;
+    margin: 0 auto 36px;
+  }
+
+  .profile-wrap::before {
+    content: '';
+    position: absolute;
+    inset: -4px;
+    border-radius: 50%;
+    background: conic-gradient(var(--cyan), var(--pink), var(--gold), var(--cyan));
+    animation: spinGlow 4s linear infinite;
+    z-index: -1;
+  }
+
+  .profile-wrap::after {
+    content: '';
+    position: absolute;
+    inset: -4px;
+    border-radius: 50%;
+    background: conic-gradient(var(--cyan), var(--pink), var(--gold), var(--cyan));
+    filter: blur(10px);
+    opacity: 0.5;
+    animation: spinGlow 4s linear infinite;
+    z-index: -2;
+  }
+
+  @keyframes spinGlow {
+    to { transform: rotate(360deg); }
+  }
+
+  .profile-img {
+    width: 140px;
+    height: 140px;
+    border-radius: 50%;
+    object-fit: cover;
+    border: 4px solid var(--bg);
+    background: var(--surface);
+    display: block;
+  }
+
+  .profile-placeholder {
+    width: 100%;
+    height: 100%;
+    border-radius: 50%;
+    background: linear-gradient(135deg, #0d1117 0%, #1a1f2e 100%);
+    border: 4px solid var(--bg);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 52px;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .profile-placeholder::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(180deg, rgba(0,245,255,0.08) 0%, transparent 100%);
+  }
+
+  .home-tag {
+    font-family: 'Space Mono', monospace;
+    font-size: 11px;
+    color: var(--cyan);
+    letter-spacing: 4px;
+    text-transform: uppercase;
+    margin-bottom: 20px;
+    opacity: 0.8;
+    animation: fadeUp 0.8s ease both;
+  }
+
+  .home-heading {
+    font-size: clamp(26px, 5vw, 52px);
+    font-weight: 900;
+    line-height: 1.1;
+    text-align: center;
+    max-width: 700px;
+    margin: 0 auto 48px;
+    animation: fadeUp 0.8s 0.1s ease both;
+    background: linear-gradient(135deg, #fff 0%, var(--cyan) 50%, var(--pink) 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    filter: drop-shadow(0 0 30px rgba(0,245,255,0.2));
+  }
+
+  @keyframes fadeUp {
+    from { opacity: 0; transform: translateY(20px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  /* ── BUTTONS ── */
+  .btn-primary {
+    position: relative;
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+    padding: 18px 52px;
+    background: transparent;
+    border: 2px solid var(--cyan);
+    color: var(--cyan);
+    font-family: 'Montserrat', sans-serif;
+    font-weight: 700;
+    font-size: 15px;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    border-radius: var(--radius);
+    cursor: pointer;
+    overflow: hidden;
+    transition: all 0.3s ease;
+    box-shadow: var(--glow-c), inset 0 0 20px rgba(0,245,255,0.05);
+    animation: fadeUp 0.8s 0.2s ease both;
+  }
+
+  .btn-primary::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: var(--cyan);
+    transform: scaleX(0);
+    transform-origin: left;
+    transition: transform 0.3s ease;
+    z-index: -1;
+  }
+
+  .btn-primary:hover {
+    color: var(--bg);
+    box-shadow: var(--glow-c), 0 0 60px rgba(0,245,255,0.4);
+    transform: translateY(-2px);
+  }
+
+  .btn-primary:hover::before { transform: scaleX(1); }
+
+  .btn-primary:active { transform: translateY(0); }
+
+  .btn-naman {
+    display: inline-flex;
+    align-items: center;
+    padding: 10px 24px;
+    background: transparent;
+    border: 2px solid var(--gold);
+    color: var(--gold);
+    font-family: 'Space Mono', monospace;
+    font-weight: 700;
+    font-size: 13px;
+    letter-spacing: 3px;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    box-shadow: 0 0 12px rgba(255,217,90,0.3);
+    position: relative;
+    overflow: hidden;
+  }
+
+  .btn-naman::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: var(--gold);
+    transform: scaleX(0);
+    transform-origin: left;
+    transition: transform 0.3s ease;
+    z-index: -1;
+  }
+
+  .btn-naman:hover {
+    color: #000;
+    box-shadow: 0 0 30px rgba(255,217,90,0.6);
+  }
+
+  .btn-naman:hover::before { transform: scaleX(1); }
+
+  .btn-submit {
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+    padding: 18px 52px;
+    background: linear-gradient(135deg, var(--pink) 0%, #c0185a 100%);
+    border: none;
+    color: #fff;
+    font-family: 'Montserrat', sans-serif;
+    font-weight: 700;
+    font-size: 15px;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    border-radius: var(--radius);
+    cursor: pointer;
+    transition: all 0.3s ease;
+    box-shadow: var(--glow-p), 0 4px 24px rgba(255,45,120,0.3);
+    margin-top: 40px;
+  }
+
+  .btn-submit:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 0 24px #ff2d78cc, 0 0 60px #ff2d7855, 0 8px 32px rgba(255,45,120,0.4);
+  }
+
+  .btn-submit:disabled {
+    opacity: 0.4;
+    cursor: not-allowed;
+    transform: none;
+  }
+
+  /* ── EASTER EGG SECTION ── */
+  .easter-section {
+    margin-top: 80px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 16px;
+    animation: fadeUp 0.8s 0.4s ease both;
+  }
+
+  .easter-row {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    flex-wrap: wrap;
+    justify-content: center;
+  }
+
+  .easter-text {
+    font-family: 'Space Mono', monospace;
+    font-size: 12px;
+    color: var(--muted);
+    letter-spacing: 1px;
+  }
+
+  .easter-img-wrap {
+    display: none;
+    margin-top: 20px;
+  }
+
+  .easter-img-wrap.visible {
+    display: block;
+    animation: fadeUp 0.5s ease both;
+  }
+
+  .easter-img {
+    width: 180px;
+    height: 180px;
+    border-radius: var(--radius);
+    object-fit: cover;
+    border: 2px solid var(--gold);
+    box-shadow: 0 0 30px rgba(255,217,90,0.4);
+    background: var(--surface);
+  }
+
+  .easter-img-placeholder {
+    width: 180px;
+    height: 180px;
+    border-radius: var(--radius);
+    border: 2px solid var(--gold);
+    box-shadow: 0 0 30px rgba(255,217,90,0.4);
+    background: linear-gradient(135deg, #1a1810 0%, #2a2415 100%);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 40px;
+    color: var(--gold);
+  }
+
+  /* ── FOOTER ── */
+  footer {
+    position: relative;
+    z-index: 1;
+    text-align: center;
+    padding: 24px;
+    font-family: 'Space Mono', monospace;
+    font-size: 11px;
+    color: var(--muted);
+    letter-spacing: 2px;
+    border-top: 1px solid var(--border);
+  }
+
+  /* ── QUIZ PAGE ── */
+  #quiz {
+    max-width: 760px;
+    width: 100%;
+    margin: 0 auto;
+    gap: 32px;
+  }
+
+  .quiz-header {
+    text-align: center;
+    padding: 40px 0 20px;
+  }
+
+  .quiz-tag {
+    font-family: 'Space Mono', monospace;
+    font-size: 11px;
+    color: var(--pink);
+    letter-spacing: 4px;
+    text-transform: uppercase;
+    margin-bottom: 12px;
+  }
+
+  .quiz-title {
+    font-size: clamp(22px, 4vw, 36px);
+    font-weight: 900;
+    background: linear-gradient(135deg, #fff 0%, var(--pink) 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+  }
+
+  .progress-bar-wrap {
+    width: 100%;
+    height: 3px;
+    background: var(--border);
+    border-radius: 99px;
+    overflow: hidden;
+    margin-top: 24px;
+  }
+
+  .progress-bar-fill {
+    height: 100%;
+    background: linear-gradient(90deg, var(--cyan), var(--pink));
+    border-radius: 99px;
+    transition: width 0.6s var(--transition);
+    box-shadow: 0 0 10px var(--cyan);
+  }
+
+  /* ── QUESTION CARD ── */
+  .question-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 20px;
+    padding: 36px;
+    backdrop-filter: blur(16px);
+    -webkit-backdrop-filter: blur(16px);
+    position: relative;
+    overflow: hidden;
+    transition: border-color 0.3s, box-shadow 0.3s;
+    animation: fadeUp 0.6s ease both;
+  }
+
+  .question-card::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0; right: 0;
+    height: 2px;
+    background: linear-gradient(90deg, transparent, var(--cyan), transparent);
+    opacity: 0;
+    transition: opacity 0.3s;
+  }
+
+  .question-card:focus-within::before { opacity: 1; }
+  .question-card:focus-within {
+    border-color: rgba(0,245,255,0.25);
+    box-shadow: 0 0 0 1px rgba(0,245,255,0.1), 0 20px 40px rgba(0,0,0,0.4);
+  }
+
+  .question-card.answered { border-color: rgba(0,245,255,0.2); }
+
+  .question-card:nth-child(1) { animation-delay: 0.05s; }
+  .question-card:nth-child(2) { animation-delay: 0.1s; }
+  .question-card:nth-child(3) { animation-delay: 0.15s; }
+  .question-card:nth-child(4) { animation-delay: 0.2s; }
+  .question-card:nth-child(5) { animation-delay: 0.25s; }
+
+  .q-number {
+    font-family: 'Space Mono', monospace;
+    font-size: 11px;
+    color: var(--cyan);
+    letter-spacing: 3px;
+    text-transform: uppercase;
+    margin-bottom: 12px;
+    opacity: 0.7;
+  }
+
+  .q-text {
+    font-size: 17px;
+    font-weight: 700;
+    line-height: 1.5;
+    margin-bottom: 28px;
+    color: #f0f4ff;
+  }
+
+  /* ── TEXT INPUT ── */
+  .text-input {
+    width: 100%;
+    background: rgba(0,0,0,0.3);
+    border: 1.5px solid var(--border);
+    border-radius: 10px;
+    padding: 14px 18px;
+    color: var(--text);
+    font-family: 'Montserrat', sans-serif;
+    font-size: 15px;
+    font-weight: 600;
+    outline: none;
+    transition: border-color 0.3s, box-shadow 0.3s;
+    caret-color: var(--cyan);
+  }
+
+  .text-input:focus {
+    border-color: var(--cyan);
+    box-shadow: 0 0 0 3px rgba(0,245,255,0.1);
+  }
+
+  .text-input::placeholder {
+    color: var(--muted);
+    font-weight: 400;
+  }
+
+  /* ── RADIO OPTIONS ── */
+  .options-list {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    list-style: none;
+  }
+
+  .option-label {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    padding: 14px 18px;
+    border: 1.5px solid var(--border);
+    border-radius: 12px;
+    cursor: pointer;
+    transition: all 0.25s ease;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .option-label::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(135deg, rgba(0,245,255,0.05), transparent);
+    opacity: 0;
+    transition: opacity 0.25s;
+  }
+
+  .option-label:hover {
+    border-color: rgba(0,245,255,0.3);
+    transform: translateX(4px);
+  }
+
+  .option-label:hover::before { opacity: 1; }
+
+  input[type="radio"] { display: none; }
+
+  input[type="radio"]:checked + .option-label {
+    border-color: var(--cyan);
+    box-shadow: 0 0 0 1px rgba(0,245,255,0.2), 0 4px 16px rgba(0,0,0,0.3);
+    color: var(--cyan);
+  }
+
+  input[type="radio"]:checked + .option-label::before { opacity: 1; }
+
+  .option-radio-circle {
+    width: 20px;
+    height: 20px;
+    border-radius: 50%;
+    border: 2px solid var(--muted);
+    flex-shrink: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.25s;
+  }
+
+  input[type="radio"]:checked + .option-label .option-radio-circle {
+    border-color: var(--cyan);
+    background: var(--cyan);
+    box-shadow: 0 0 10px var(--cyan);
+  }
+
+  input[type="radio"]:checked + .option-label .option-radio-circle::after {
+    content: '';
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background: var(--bg);
+    display: block;
+  }
+
+  .option-key {
+    font-family: 'Space Mono', monospace;
+    font-size: 11px;
+    opacity: 0.5;
+    flex-shrink: 0;
+  }
+
+  .option-text {
+    font-size: 14px;
+    font-weight: 600;
+  }
+
+  /* ── ANSWERED BADGE ── */
+  .answered-badge {
+    position: absolute;
+    top: 16px;
+    right: 20px;
+    font-family: 'Space Mono', monospace;
+    font-size: 10px;
+    color: var(--cyan);
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    opacity: 0;
+    transition: opacity 0.3s;
+  }
+
+  .question-card.answered .answered-badge { opacity: 0.6; }
+
+  /* ── ERROR MESSAGE ── */
+  .error-msg {
+    text-align: center;
+    padding: 16px 24px;
+    border: 1px solid rgba(255,45,120,0.3);
+    border-radius: 12px;
+    background: rgba(255,45,120,0.06);
+    color: var(--pink);
+    font-family: 'Space Mono', monospace;
+    font-size: 12px;
+    letter-spacing: 1px;
+    display: none;
+    animation: shake 0.4s ease;
+  }
+
+  .error-msg.visible { display: block; }
+
+  @keyframes shake {
+    0%, 100% { transform: translateX(0); }
+    25% { transform: translateX(-8px); }
+    75% { transform: translateX(8px); }
+  }
+
+  /* ── SUBMIT AREA ── */
+  .submit-area {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 20px;
+    padding-bottom: 60px;
+  }
+
+  /* ── MODAL ── */
+  #modal {
+    position: fixed;
+    inset: 0;
+    z-index: 1000;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 32px;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.5s ease;
+  }
+
+  #modal.active {
+    opacity: 1;
+    pointer-events: all;
+  }
+
+  .modal-backdrop {
+    position: absolute;
+    inset: 0;
+    background: rgba(0,0,0,0.92);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+  }
+
+  .modal-content {
+    position: relative;
+    z-index: 1;
+    text-align: center;
+    max-width: 700px;
+    width: 100%;
+    transform: scale(0.85) translateY(30px);
+    transition: transform 0.5s cubic-bezier(0.16,1,0.3,1);
+  }
+
+  #modal.active .modal-content {
+    transform: scale(1) translateY(0);
+  }
+
+  .modal-particles {
+    position: absolute;
+    inset: -100px;
+    pointer-events: none;
+    overflow: hidden;
+  }
+
+  .particle {
+    position: absolute;
+    width: 4px;
+    height: 4px;
+    border-radius: 50%;
+    background: var(--cyan);
+    animation: particleFly 2s ease-out forwards;
+  }
+
+  @keyframes particleFly {
+    0% { transform: translate(0,0) scale(0); opacity: 1; }
+    100% { transform: translate(var(--dx), var(--dy)) scale(0); opacity: 0; }
+  }
+
+  .modal-crown {
+    font-size: 64px;
+    line-height: 1;
+    margin-bottom: 28px;
+    animation: bounce 1s 0.5s ease both;
+  }
+
+  @keyframes bounce {
+    0% { transform: scale(0) rotate(-20deg); opacity: 0; }
+    60% { transform: scale(1.2) rotate(5deg); opacity: 1; }
+    80% { transform: scale(0.95) rotate(-2deg); }
+    100% { transform: scale(1) rotate(0); }
+  }
+
+  .modal-title {
+    font-size: clamp(28px, 6vw, 56px);
+    font-weight: 900;
+    line-height: 1.15;
+    background: linear-gradient(135deg, var(--cyan) 0%, #fff 30%, var(--gold) 60%, var(--pink) 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    filter: drop-shadow(0 0 40px rgba(0,245,255,0.5));
+    animation: glowPulse 2s 0.5s ease infinite alternate;
+  }
+
+  @keyframes glowPulse {
+    from { filter: drop-shadow(0 0 20px rgba(0,245,255,0.4)); }
+    to { filter: drop-shadow(0 0 50px rgba(0,245,255,0.8)) drop-shadow(0 0 80px rgba(255,45,120,0.3)); }
+  }
+
+  .modal-sub {
+    margin-top: 24px;
+    font-family: 'Space Mono', monospace;
+    font-size: 13px;
+    color: var(--muted);
+    letter-spacing: 2px;
+  }
+
+  .modal-close {
+    margin-top: 40px;
+    display: inline-flex;
+    padding: 14px 40px;
+    background: transparent;
+    border: 1.5px solid var(--muted);
+    color: var(--muted);
+    font-family: 'Space Mono', monospace;
+    font-size: 12px;
+    letter-spacing: 3px;
+    border-radius: 10px;
+    cursor: pointer;
+    transition: all 0.3s;
+    text-transform: uppercase;
+  }
+
+  .modal-close:hover {
+    border-color: var(--text);
+    color: var(--text);
+  }
+
+  /* ── SCANLINE EFFECT ── */
+  .scanlines {
+    position: fixed;
+    inset: 0;
+    background: repeating-linear-gradient(
+      0deg,
+      transparent,
+      transparent 3px,
+      rgba(0,0,0,0.05) 3px,
+      rgba(0,0,0,0.05) 4px
+    );
+    pointer-events: none;
+    z-index: 2000;
+    opacity: 0.4;
+  }
+
+  /* ── RESPONSIVE ── */
+  @media (max-width: 600px) {
+    .question-card { padding: 24px 20px; }
+    .btn-primary, .btn-submit { padding: 16px 36px; font-size: 13px; }
+  }
+</style>
+</head>
+<body>
+
+<div class="noise"></div>
+<div class="scanlines"></div>
+
+<!-- ═══════════════════════════════ HOME PAGE ═══════════════════════════════ -->
+<section class="page" id="home">
+  <div class="profile-wrap">
+    <div class="profile-placeholder">👤</div>
+    <!-- Replace the div above with: <img class="profile-img" src="" alt="Naman"> -->
+  </div>
+
+  <p class="home-tag">// Take the challenge</p>
+
+  <h1 class="home-heading">
+    Try this test to find out<br>how much you know about Naman
+  </h1>
+
+  <button class="btn-primary" onclick="startQuiz()">
+    <span>⚡</span> Try Quiz
+  </button>
+
+  <!-- EASTER EGG -->
+  <div class="easter-section">
+    <div class="easter-row">
+      <span class="easter-text">If you are Naman, press this</span>
+      <button class="btn-naman" onclick="revealEaster()">NAMAN</button>
+    </div>
+
+    <div class="easter-img-wrap" id="easterImg">
+      <div class="easter-img-placeholder">🤫</div>
+      <!-- Replace with: <img class="easter-img" src="" alt="Secret"> -->
+    </div>
+  </div>
+</section>
+
+<!-- ═══════════════════════════════ QUIZ PAGE ═══════════════════════════════ -->
+<section class="page hidden" id="quiz">
+
+  <div class="quiz-header">
+    <p class="quiz-tag">// Knowledge Test</p>
+    <h2 class="quiz-title">The Naman Files</h2>
+    <div class="progress-bar-wrap">
+      <div class="progress-bar-fill" id="progressBar" style="width:0%"></div>
+    </div>
+  </div>
+
+  <!-- Q1: Text Input -->
+  <div class="question-card" id="card-1">
+    <span class="answered-badge">✓ answered</span>
+    <p class="q-number">Question 01 / 05</p>
+    <p class="q-text">Who is Naman's father?</p>
+    <input
+      class="text-input"
+      id="q1-input"
+      type="text"
+      placeholder="Type your answer here..."
+      oninput="onTextInput()"
+      autocomplete="off"
+    />
+  </div>
+
+  <!-- Q2: Mother -->
+  <div class="question-card" id="card-2">
+    <span class="answered-badge">✓ answered</span>
+    <p class="q-number">Question 02 / 05</p>
+    <p class="q-text">Who is Naman's mother?</p>
+    <ul class="options-list">
+      <li>
+        <input type="radio" name="q2" id="q2a" value="a" onchange="onRadioChange('card-2','q2')">
+        <label class="option-label" for="q2a">
+          <span class="option-radio-circle"></span>
+          <span class="option-key">A)</span>
+          <span class="option-text">Shalini</span>
+        </label>
+      </li>
+      <li>
+        <input type="radio" name="q2" id="q2b" value="b" onchange="onRadioChange('card-2','q2')">
+        <label class="option-label" for="q2b">
+          <span class="option-radio-circle"></span>
+          <span class="option-key">B)</span>
+          <span class="option-text">Nita</span>
+        </label>
+      </li>
+      <li>
+        <input type="radio" name="q2" id="q2c" value="c" onchange="onRadioChange('card-2','q2')">
+        <label class="option-label" for="q2c">
+          <span class="option-radio-circle"></span>
+          <span class="option-key">C)</span>
+          <span class="option-text">Ranju Devi</span>
+        </label>
+      </li>
+    </ul>
+  </div>
+
+  <!-- Q3: Dumpyard -->
+  <div class="question-card" id="card-3">
+    <span class="answered-badge">✓ answered</span>
+    <p class="q-number">Question 03 / 05</p>
+    <p class="q-text">From where did Naman's father bring Naman after he was thrown away by Ranju?</p>
+    <ul class="options-list">
+      <li>
+        <input type="radio" name="q3" id="q3a" value="a" onchange="onRadioChange('card-3','q3')">
+        <label class="option-label" for="q3a">
+          <span class="option-radio-circle"></span>
+          <span class="option-key">A)</span>
+          <span class="option-text">Roadside</span>
+        </label>
+      </li>
+      <li>
+        <input type="radio" name="q3" id="q3b" value="b" onchange="onRadioChange('card-3','q3')">
+        <label class="option-label" for="q3b">
+          <span class="option-radio-circle"></span>
+          <span class="option-key">B)</span>
+          <span class="option-text">Chandmari Dumpyard</span>
+        </label>
+      </li>
+      <li>
+        <input type="radio" name="q3" id="q3c" value="c" onchange="onRadioChange('card-3','q3')">
+        <label class="option-label" for="q3c">
+          <span class="option-radio-circle"></span>
+          <span class="option-key">C)</span>
+          <span class="option-text">In front of Ranju's house</span>
+        </label>
+      </li>
+    </ul>
+  </div>
+
+  <!-- Q4: Birthday -->
+  <div class="question-card" id="card-4">
+    <span class="answered-badge">✓ answered</span>
+    <p class="q-number">Question 04 / 05</p>
+    <p class="q-text">When is Naman's birthday?</p>
+    <ul class="options-list">
+      <li>
+        <input type="radio" name="q4" id="q4a" value="a" onchange="onRadioChange('card-4','q4')">
+        <label class="option-label" for="q4a">
+          <span class="option-radio-circle"></span>
+          <span class="option-key">A)</span>
+          <span class="option-text">10 May</span>
+        </label>
+      </li>
+      <li>
+        <input type="radio" name="q4" id="q4b" value="b" onchange="onRadioChange('card-4','q4')">
+        <label class="option-label" for="q4b">
+          <span class="option-radio-circle"></span>
+          <span class="option-key">B)</span>
+          <span class="option-text">1 January</span>
+        </label>
+      </li>
+      <li>
+        <input type="radio" name="q4" id="q4c" value="c" onchange="onRadioChange('card-4','q4')">
+        <label class="option-label" for="q4c">
+          <span class="option-radio-circle"></span>
+          <span class="option-key">C)</span>
+          <span class="option-text">8 August</span>
+        </label>
+      </li>
+    </ul>
+  </div>
+
+  <!-- Q5: Girlfriend -->
+  <div class="question-card" id="card-5">
+    <span class="answered-badge">✓ answered</span>
+    <p class="q-number">Question 05 / 05</p>
+    <p class="q-text">Who is Naman's girlfriend?</p>
+    <ul class="options-list">
+      <li>
+        <input type="radio" name="q5" id="q5a" value="a" onchange="onRadioChange('card-5','q5')">
+        <label class="option-label" for="q5a">
+          <span class="option-radio-circle"></span>
+          <span class="option-key">A)</span>
+          <span class="option-text">Anushka</span>
+        </label>
+      </li>
+      <li>
+        <input type="radio" name="q5" id="q5b" value="b" onchange="onRadioChange('card-5','q5')">
+        <label class="option-label" for="q5b">
+          <span class="option-radio-circle"></span>
+          <span class="option-key">B)</span>
+          <span class="option-text">Ritiksha</span>
+        </label>
+      </li>
+      <li>
+        <input type="radio" name="q5" id="q5c" value="c" onchange="onRadioChange('card-5','q5')">
+        <label class="option-label" for="q5c">
+          <span class="option-radio-circle"></span>
+          <span class="option-key">C)</span>
+          <span class="option-text">Megharan</span>
+        </label>
+      </li>
+    </ul>
+  </div>
+
+  <!-- SUBMIT -->
+  <div class="submit-area">
+    <div class="error-msg" id="errorMsg">
+      ⚠ &nbsp;Some answers are wrong — try again!
+    </div>
+    <button class="btn-submit" onclick="submitQuiz()">
+      <span>🚀</span> Submit Answers
+    </button>
+  </div>
+</section>
+
+<!-- ═══════════════════════════════ MODAL ═══════════════════════════════ -->
+<div id="modal">
+  <div class="modal-backdrop"></div>
+  <div class="modal-content">
+    <div class="modal-particles" id="particles"></div>
+    <div class="modal-crown">👑</div>
+    <h2 class="modal-title">
+      You have answered all the answers correctly.<br>This proves that you are NAMAN'S FATHER.
+    </h2>
+    <p class="modal-sub">// identity confirmed — welcome, father</p>
+    <button class="modal-close" onclick="closeModal()">Close</button>
+  </div>
+</div>
+
+<footer>
+  <span style="color:var(--muted)">Made By RIDHAAN for</span>
+  <span style="color:var(--cyan);margin-left:6px;">Naman</span>
+</footer>
+
+<script>
+  /* ══════════════════════════════════
+     STATE TRACKING
+  ══════════════════════════════════ */
+  const answered = { q1: false, q2: false, q3: false, q4: false, q5: false };
+
+  function updateProgress() {
+    const count = Object.values(answered).filter(Boolean).length;
+    document.getElementById('progressBar').style.width = (count / 5 * 100) + '%';
+  }
+
+  /* ══════════════════════════════════
+     NAVIGATION
+  ══════════════════════════════════ */
+  function startQuiz() {
+    document.getElementById('home').classList.add('hidden');
+    document.getElementById('quiz').classList.remove('hidden');
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  }
+
+  /* ══════════════════════════════════
+     EASTER EGG
+  ══════════════════════════════════ */
+  function revealEaster() {
+    const el = document.getElementById('easterImg');
+    el.classList.toggle('visible');
+  }
+
+  /* ══════════════════════════════════
+     INPUT HANDLERS
+  ══════════════════════════════════ */
+  function onTextInput() {
+    const val = document.getElementById('q1-input').value.trim();
+    answered.q1 = val.length > 0;
+    document.getElementById('card-1').classList.toggle('answered', answered.q1);
+    updateProgress();
+  }
+
+  function onRadioChange(cardId, name) {
+    answered[name] = true;
+    document.getElementById(cardId).classList.add('answered');
+    updateProgress();
+  }
+
+  /* ══════════════════════════════════
+     VALIDATION LOGIC
+  ══════════════════════════════════ */
+  function checkAllAnswered() {
+    return Object.values(answered).every(Boolean);
+  }
+
+  function validateAnswers() {
+    let allCorrect = true;
+
+    // Q1: Anything is correct EXCEPT variations of "Narayan" / "Narayan Chhetry"
+    const q1Val = document.getElementById('q1-input').value.trim().toLowerCase();
+    const forbidden = ['narayan', 'narayan chhetry'];
+    if (forbidden.includes(q1Val)) allCorrect = false;
+
+    // Q2: a or b are correct, c is wrong
+    const q2 = document.querySelector('input[name="q2"]:checked');
+    if (!q2 || q2.value === 'c') allCorrect = false;
+
+    // Q3: b is correct
+    const q3 = document.querySelector('input[name="q3"]:checked');
+    if (!q3 || q3.value !== 'b') allCorrect = false;
+
+    // Q4: c is correct
+    const q4 = document.querySelector('input[name="q4"]:checked');
+    if (!q4 || q4.value !== 'c') allCorrect = false;
+
+    // Q5: a is correct
+    const q5 = document.querySelector('input[name="q5"]:checked');
+    if (!q5 || q5.value !== 'a') allCorrect = false;
+
+    return allCorrect;
+  }
+
+  /* ══════════════════════════════════
+     SUBMIT
+  ══════════════════════════════════ */
+  function submitQuiz() {
+    const errEl = document.getElementById('errorMsg');
+
+    if (!checkAllAnswered()) {
+      errEl.textContent = '⚠ \u00a0Please answer all questions before submitting!';
+      errEl.classList.add('visible');
+      setTimeout(() => errEl.classList.remove('visible'), 3500);
+      return;
+    }
+
+    if (!validateAnswers()) {
+      errEl.textContent = '⚠ \u00a0Some answers are wrong — review your answers and try again!';
+      errEl.classList.add('visible');
+      setTimeout(() => errEl.classList.remove('visible'), 3500);
+      return;
+    }
+
+    // ALL CORRECT → Show modal
+    errEl.classList.remove('visible');
+    showModal();
+  }
+
+  /* ══════════════════════════════════
+     MODAL
+  ══════════════════════════════════ */
+  function showModal() {
+    spawnParticles();
+    const modal = document.getElementById('modal');
+    modal.classList.add('active');
+    document.body.style.overflow = 'hidden';
+  }
+
+  function closeModal() {
+    document.getElementById('modal').classList.remove('active');
+    document.body.style.overflow = '';
+  }
+
+  function spawnParticles() {
+    const container = document.getElementById('particles');
+    container.innerHTML = '';
+    const colors = ['#00f5ff', '#ff2d78', '#ffd95a', '#ffffff'];
+    for (let i = 0; i < 60; i++) {
+      const p = document.createElement('div');
+      p.className = 'particle';
+      const angle = Math.random() * 360;
+      const dist = 80 + Math.random() * 200;
+      const dx = Math.cos(angle * Math.PI / 180) * dist + 'px';
+      const dy = Math.sin(angle * Math.PI / 180) * dist + 'px';
+      p.style.cssText = `
+        left: 50%; top: 50%;
+        background: ${colors[Math.floor(Math.random() * colors.length)]};
+        --dx: ${dx}; --dy: ${dy};
+        animation-delay: ${Math.random() * 0.5}s;
+        animation-duration: ${1 + Math.random()}s;
+        width: ${2 + Math.random() * 5}px;
+        height: ${2 + Math.random() * 5}px;
+      `;
+      container.appendChild(p);
+    }
+  }
+
+  // Close modal on backdrop click
+  document.getElementById('modal').addEventListener('click', function(e) {
+    if (e.target === this || e.target.classList.contains('modal-backdrop')) {
+      closeModal();
+    }
+  });
+
+  // Close modal on Escape
+  document.addEventListener('keydown', e => {
+    if (e.key === 'Escape') closeModal();
+  });
+</script>
+</body>
+</html>
+
